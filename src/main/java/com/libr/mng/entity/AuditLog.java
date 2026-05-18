@@ -30,8 +30,6 @@ public class AuditLog {
 
     private LocalDateTime actionDate;
 
-    private String ipAddress;       // optional – store client IP
-
     @PrePersist
     protected void onCreate() {
         actionDate = LocalDateTime.now();
