@@ -1,13 +1,21 @@
 package com.libr.mng.entity;
  
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-
 import lombok.Data;
-
 import lombok.NoArgsConstructor;
  
 @Entity
@@ -33,34 +41,41 @@ public class User {
     @Column(nullable = false)
     private String role;   // "ADMIN" or "USER"
 
-    private String employeeId;
+    @Column(unique = true, nullable = false)
+    private Long employeeId;
     
     private LocalDateTime createdAt;
+    
+    private String resetOtp;
+    
+    private LocalDateTime otpExpiry;
+    
+    private String profileImage;  
     
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
  
-//    // Relationships
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<BookRequest> bookRequests = new ArrayList<>();
-// 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<BookIssue> bookIssues = new ArrayList<>();
-// 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Waitlist> waitlists = new ArrayList<>();
-// 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Wishlist> wishlists = new ArrayList<>();
-// 
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Notification> notifications = new ArrayList<>();
-// 
-//    // For librarian/admin who processes returns
-//    @OneToMany(mappedBy = "processedBy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<BookReturn> processedReturns = new ArrayList<>();
+    // Relationships
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BookRequest> bookRequests = new ArrayList<>();
+ 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BookIssue> bookIssues = new ArrayList<>();
+ 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Waitlist> waitlists = new ArrayList<>();
+ 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Wishlist> wishlists = new ArrayList<>();
+ 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Notification> notifications = new ArrayList<>();
+ 
+    // For librarian/admin who processes returns
+    @OneToMany(mappedBy = "processedBy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BookReturn> processedReturns = new ArrayList<>();
 
 }
  
