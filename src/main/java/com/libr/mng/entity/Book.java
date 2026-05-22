@@ -41,7 +41,8 @@ public class Book {
     private Integer totalCopies;
 
     private Integer availableCopies;
-
+    
+    private String imageUrl;
 
     @Column(nullable = false)
     private String bookStatus;
