@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
@@ -14,8 +15,12 @@ import com.libr.mng.dto.request.BookRequestDTO;
 import com.libr.mng.dto.request.BookUpdateRequestDTO;
 import com.libr.mng.dto.response.BookResponseDTO;
 import com.libr.mng.entity.Book;
+import com.libr.mng.entity.Notification;
+import com.libr.mng.entity.Waitlist;
 import com.libr.mng.exception.ResourceNotFoundException;
 import com.libr.mng.repository.BookRepository;
+import com.libr.mng.repository.NotificationRepository;
+import com.libr.mng.repository.WaitlistRepository;
 import com.libr.mng.service.BookService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +32,8 @@ public class BookServiceImpl implements BookService {
 	private final BookRepository bookRepository;
 	private final ModelMapper modelMapper;
 	private final Cloudinary cloudinary;
+	private final WaitlistRepository waitlistRepository;
+	private final NotificationRepository notificationRepository;
 
 	@Override
 	public BookResponseDTO addBook(BookRequestDTO dto, MultipartFile image) throws IOException {
@@ -53,43 +60,43 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	@Transactional
 	public BookResponseDTO updateBook(Long bookId, BookUpdateRequestDTO dto, MultipartFile image) throws IOException {
 
 		Book book = bookRepository.findById(bookId)
 				.orElseThrow(() -> new ResourceNotFoundException("Book not found with id : " + bookId));
 
-		// Partial Update
+		Integer oldAvailableCopies = book.getAvailableCopies();
 
 		if (dto.getTitle() != null && !dto.getTitle().trim().isEmpty()) {
+
 			book.setTitle(dto.getTitle());
 		}
 
 		if (dto.getAuthor() != null && !dto.getAuthor().trim().isEmpty()) {
+
 			book.setAuthor(dto.getAuthor());
 		}
 
 		if (dto.getCategory() != null && !dto.getCategory().trim().isEmpty()) {
+
 			book.setCategory(dto.getCategory());
 		}
 
 		if (dto.getPublisher() != null && !dto.getPublisher().trim().isEmpty()) {
+
 			book.setPublisher(dto.getPublisher());
 		}
 
 		if (dto.getDescription() != null && !dto.getDescription().trim().isEmpty()) {
+
 			book.setDescription(dto.getDescription());
 		}
 
 		if (dto.getPublicationYear() != null) {
+
 			book.setPublicationYear(dto.getPublicationYear());
 		}
-
-		if (dto.getBookStatus() != null && !dto.getBookStatus().trim().isEmpty()) {
-
-			book.setBookStatus(dto.getBookStatus());
-		}
-
-		// ISBN Update Validation
 
 		if (dto.getIsbnNumber() != null && !dto.getIsbnNumber().trim().isEmpty()) {
 
@@ -103,11 +110,10 @@ public class BookServiceImpl implements BookService {
 			book.setIsbnNumber(dto.getIsbnNumber());
 		}
 
-		// Total Copies Update
-
 		if (dto.getTotalCopies() != null) {
 
 			if (dto.getTotalCopies() < 1) {
+
 				throw new IllegalStateException("Total copies must be greater than 0");
 			}
 
@@ -118,12 +124,10 @@ public class BookServiceImpl implements BookService {
 				book.setAvailableCopies(dto.getTotalCopies());
 			}
 		}
-
-		// Available Copies Update
-
 		if (dto.getAvailableCopies() != null) {
 
 			if (dto.getAvailableCopies() < 0) {
+
 				throw new IllegalStateException("Available copies cannot be negative");
 			}
 
@@ -135,7 +139,10 @@ public class BookServiceImpl implements BookService {
 			book.setAvailableCopies(dto.getAvailableCopies());
 		}
 
-		// Upload New Image
+		if (dto.getBookStatus() != null && !dto.getBookStatus().trim().isEmpty()) {
+
+			book.setBookStatus(dto.getBookStatus());
+		}
 
 		if (image != null && !image.isEmpty()) {
 
@@ -144,8 +151,6 @@ public class BookServiceImpl implements BookService {
 			book.setImageUrl(uploadResult.get("secure_url").toString());
 		}
 
-		// Auto Status
-
 		if (book.getAvailableCopies() == 0) {
 
 			book.setBookStatus("OUT_OF_STOCK");
@@ -153,6 +158,23 @@ public class BookServiceImpl implements BookService {
 		} else {
 
 			book.setBookStatus("AVAILABLE");
+		}
+
+		if (oldAvailableCopies == 0 && book.getAvailableCopies() > 0) {
+
+			List<Waitlist> waitlists = waitlistRepository.findByBookBookIdAndStatus(book.getBookId(), "WAITING");
+
+			for (Waitlist waitlist : waitlists) {
+
+				Notification notification = Notification.builder().user(waitlist.getUser()).title("Book Available")
+						.message("The book '" + book.getTitle() + "' is now available.").type("BOOK_AVAILABLE").build();
+
+				notificationRepository.save(notification);
+
+				waitlist.setStatus("NOTIFIED");
+
+				waitlistRepository.save(waitlist);
+			}
 		}
 
 		Book updatedBook = bookRepository.save(book);

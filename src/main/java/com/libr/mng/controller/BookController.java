@@ -32,10 +32,6 @@ public class BookController {
 
 	private final BookService bookService;
 
-	// ==========================================
-	// ADD BOOK (ADMIN ONLY)
-	// ==========================================
-
 	@PostMapping(consumes = "multipart/form-data")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<BookResponseDTO> addBook(@Valid @ModelAttribute BookRequestDTO dto,
@@ -45,10 +41,6 @@ public class BookController {
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
-
-	// ==========================================
-	// UPDATE BOOK (ADMIN ONLY)
-	// ==========================================
 
 	@PutMapping(value = "/{bookId}", consumes = "multipart/form-data")
 	@PreAuthorize("hasRole('ADMIN')")
@@ -63,10 +55,6 @@ public class BookController {
 		return ResponseEntity.ok(response);
 	}
 
-	// ==========================================
-	// DELETE BOOK (ADMIN ONLY)
-	// ==========================================
-
 	@DeleteMapping("/{bookId}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<String> deleteBook(@PathVariable Long bookId) {
@@ -75,11 +63,6 @@ public class BookController {
 
 		return ResponseEntity.ok("Book deleted successfully");
 	}
-
-	// ==========================================
-	// GET BOOK BY ID
-	// ADMIN + EMPLOYEE
-	// ==========================================
 
 	@GetMapping("/{bookId}")
 	@PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
@@ -90,11 +73,6 @@ public class BookController {
 		return ResponseEntity.ok(response);
 	}
 
-	// ==========================================
-	// GET ALL BOOKS
-	// ADMIN + EMPLOYEE
-	// ==========================================
-
 	@GetMapping
 	@PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
 	public ResponseEntity<List<BookResponseDTO>> getAllBooks() {
@@ -104,11 +82,6 @@ public class BookController {
 		return ResponseEntity.ok(response);
 	}
 
-	// ==========================================
-	// SEARCH BOOKS
-	// ADMIN + EMPLOYEE
-	// ==========================================
-
 	@GetMapping("/search")
 	@PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
 	public ResponseEntity<List<BookResponseDTO>> searchBooks(@RequestParam String keyword) {
@@ -117,11 +90,6 @@ public class BookController {
 
 		return ResponseEntity.ok(response);
 	}
-
-	// ==========================================
-	// FILTER BY CATEGORY
-	// ADMIN + EMPLOYEE
-	// ==========================================
 
 	@GetMapping("/category/{category}")
 	@PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
