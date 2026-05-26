@@ -1,25 +1,29 @@
 package com.libr.mng.dto.response;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookBorrowResponseDTO {
+public class AdminBookRequestResponseDTO {
 
     private Long requestId;
-    private Long userId;
-    private String userName;
+
+    private Long employeeId;
+
+    private String employeeName;
+
     private Long bookId;
+
     private String bookTitle;
+
     private LocalDate requestDate;
-    private String requestStatus;  // "PENDING", "APPROVED", "REJECTED"
-    private String adminRemarks;
-    private LocalDate processedDate;
+
+    private String requestStatus;
 }

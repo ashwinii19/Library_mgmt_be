@@ -6,14 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryRequestDTO {
+@Data
+public class ApproveRejectRequestDTO {
 
-    @NotBlank(message = "Category name is required")
-    private String categoryName;
-
-    private String categoryDescription;
+    @NotBlank(message = "Remarks required")
+    private String adminRemarks;
 }
