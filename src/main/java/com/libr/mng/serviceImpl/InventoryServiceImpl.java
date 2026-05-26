@@ -23,6 +23,7 @@ import com.libr.mng.repository.BookRepository;
 import com.libr.mng.repository.BookRequestRepository;
 import com.libr.mng.repository.NotificationRepository;
 import com.libr.mng.repository.UserRepository;
+import com.libr.mng.repository.WishlistRepository;
 import com.libr.mng.security.CustomUserDetails;
 import com.libr.mng.service.InventoryService;
 
@@ -38,6 +39,7 @@ public class InventoryServiceImpl implements InventoryService {
 	private final UserRepository userRepository;
 	private final AuditLogRepository auditLogRepository;
 	private final NotificationRepository notificationRepository;
+	private final WishlistRepository wishlistRepository;
 
 	@Override
 	public List<InventoryResponseDTO> getInventory() {
@@ -63,6 +65,8 @@ public class InventoryServiceImpl implements InventoryService {
 	@Override
 	public BookDetailsResponseDTO getBookDetails(Long bookId) {
 
+		User user = getLoggedInUser();
+
 		Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
 		BookDetailsResponseDTO dto = modelMapper.map(book, BookDetailsResponseDTO.class);
@@ -70,6 +74,13 @@ public class InventoryServiceImpl implements InventoryService {
 		dto.setIssueAllowed(book.getAvailableCopies() > 0);
 
 		dto.setWishlistAllowed(true);
+
+		dto.setAlreadyWishlisted(wishlistRepository.existsByUserIdAndBookBookId(user.getId(), bookId));
+
+		dto.setAlreadyRequested(bookRequestRepository
+				.findByUserIdAndBookBookIdAndRequestStatus(user.getId(), bookId, "PENDING").isPresent());
+
+		dto.setNotifyAvailable(book.getAvailableCopies() == 0);
 
 		return dto;
 	}

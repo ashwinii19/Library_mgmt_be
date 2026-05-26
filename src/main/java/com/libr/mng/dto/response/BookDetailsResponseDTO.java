@@ -31,11 +31,17 @@ public class BookDetailsResponseDTO {
 
     private Integer availableCopies;
 
-    private String bookStatus;
-
     private String imageUrl;
+
+    private String bookStatus;
 
     private boolean issueAllowed;
 
     private boolean wishlistAllowed;
+
+    private boolean alreadyWishlisted;
+
+    private boolean alreadyRequested;
+
+    private boolean notifyAvailable;
 }

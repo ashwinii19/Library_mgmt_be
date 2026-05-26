@@ -29,12 +29,10 @@ public class EmailService {
         this.templateEngine = templateEngine;
     }
 
-    // ✅ Method that matches the call from AuthServiceImpl
     public void sendSimpleMail(String to, String subject, String text) {
         sendSimpleEmail(to, subject, text);
     }
 
-    // Method to send a simple text email (for OTP)
     public void sendSimpleEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
