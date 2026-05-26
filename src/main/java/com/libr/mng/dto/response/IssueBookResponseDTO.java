@@ -10,14 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class IssueBookResponseDTO {
-
-    private Long requestId;
-
-    private Long bookId;
-
-    private String title;
-
-    private String requestStatus;
-
-    private String message;
+	private Long requestId;
+	private Long bookId;
+	private String title;
+	private String requestStatus;
+	private String message;
 }

@@ -9,9 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryResponseDTO {
+public class AdminDashboardResponseDTO {
 
-    private Long categoryId;
-    private String categoryName;
-    private String categoryDescription;
+    private Long totalBooks;
+
+    private Long totalCopies;
+
+    private Long availableCopies;
+
+    private Long pendingRequests;
 }

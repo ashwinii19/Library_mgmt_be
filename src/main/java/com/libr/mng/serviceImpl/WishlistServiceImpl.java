@@ -2,6 +2,7 @@ package com.libr.mng.serviceImpl;
 
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,12 +28,10 @@ import lombok.RequiredArgsConstructor;
 public class WishlistServiceImpl implements WishlistService {
 
 	private final WishlistRepository wishlistRepository;
-
 	private final BookRepository bookRepository;
-
 	private final AuditLogRepository auditLogRepository;
-
 	private final WaitlistRepository waitlistRepository;
+	private final ModelMapper modelMapper;
 
 	private User getLoggedInUser() {
 
@@ -91,25 +90,11 @@ public class WishlistServiceImpl implements WishlistService {
 
 			Book book = wishlist.getBook();
 
-			WishlistResponseDTO dto = new WishlistResponseDTO();
+			WishlistResponseDTO dto = modelMapper.map(book, WishlistResponseDTO.class);
 
 			dto.setWishlistId(wishlist.getWishlistId());
 
 			dto.setBookId(book.getBookId());
-
-			dto.setTitle(book.getTitle());
-
-			dto.setAuthor(book.getAuthor());
-
-			dto.setCategory(book.getCategory());
-
-			dto.setImageUrl(book.getImageUrl());
-
-			dto.setAvailableCopies(book.getAvailableCopies());
-
-			dto.setTotalCopies(book.getTotalCopies());
-
-			dto.setBookStatus(book.getBookStatus());
 
 			dto.setIssueAllowed(book.getAvailableCopies() > 0);
 
