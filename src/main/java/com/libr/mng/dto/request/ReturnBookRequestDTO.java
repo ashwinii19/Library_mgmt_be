@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RenewalRequestDTO {
+public class ReturnBookRequestDTO {
 
     private String remarks;
 }
