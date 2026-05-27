@@ -7,13 +7,13 @@ import com.libr.mng.dto.response.NotificationResponseDTO;
 
 public interface NotificationService {
 
-    List<NotificationResponseDTO> getNotifications();
+	List<NotificationResponseDTO> getNotifications();
 
-    NotificationCountResponseDTO getUnreadCount();
+	NotificationCountResponseDTO getUnreadCount();
 
-    String markAsRead(Long notificationId);
+	String markAsRead(Long notificationId);
 
-    String markAllAsRead();
+	String markAllAsRead();
 
-    String deleteNotification(Long notificationId);
+	String deleteNotification(Long notificationId);
 }

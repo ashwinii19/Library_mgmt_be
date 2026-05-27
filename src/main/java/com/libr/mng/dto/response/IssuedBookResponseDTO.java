@@ -50,4 +50,10 @@ public class IssuedBookResponseDTO {
     private Long remainingSeconds;
 
     private String countdownNote;
+    
+    private Long remainingDays;
+
+    private Boolean countdownEnabled;
+
+    private String countdownMessage;
 }

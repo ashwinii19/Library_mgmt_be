@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -201,7 +204,11 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public List<BookResponseDTO> getAllBooks() {
 
-		return bookRepository.findAll().stream().map(book -> modelMapper.map(book, BookResponseDTO.class)).toList();
+		Pageable pageable = PageRequest.of(0, 10);
+
+		Page<Book> books = bookRepository.findAll(pageable);
+
+		return books.getContent().stream().map(book -> modelMapper.map(book, BookResponseDTO.class)).toList();
 	}
 
 	@Override
