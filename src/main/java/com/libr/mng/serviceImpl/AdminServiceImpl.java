@@ -3,6 +3,9 @@ package com.libr.mng.serviceImpl;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -15,7 +18,6 @@ import com.libr.mng.entity.AuditLog;
 import com.libr.mng.entity.Book;
 import com.libr.mng.entity.BookIssue;
 import com.libr.mng.entity.BookRequest;
-import com.libr.mng.entity.LibraryPolicy;
 import com.libr.mng.entity.Notification;
 import com.libr.mng.entity.User;
 import com.libr.mng.exception.ResourceNotFoundException;
@@ -63,7 +65,7 @@ public class AdminServiceImpl implements AdminService {
 
 		dto.setAvailableCopies(books.stream().mapToLong(Book::getAvailableCopies).sum());
 
-		dto.setPendingRequests((long) bookRequestRepository.findByRequestStatus("PENDING").size());
+		dto.setPendingRequests(bookRequestRepository.countByRequestStatus("PENDING"));
 
 		return dto;
 	}
@@ -71,7 +73,11 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public List<AdminBookRequestResponseDTO> getPendingRequests() {
 
-		return bookRequestRepository.findByRequestStatus("PENDING").stream().map(request -> {
+		Pageable pageable = PageRequest.of(0, 10);
+
+		Page<BookRequest> requests = bookRequestRepository.findByRequestStatus("PENDING", pageable);
+
+		return requests.getContent().stream().map(request -> {
 
 			AdminBookRequestResponseDTO dto = new AdminBookRequestResponseDTO();
 

@@ -3,6 +3,9 @@ package com.libr.mng.serviceImpl;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -86,7 +89,11 @@ public class WishlistServiceImpl implements WishlistService {
 
 		User user = getLoggedInUser();
 
-		return wishlistRepository.findByUserId(user.getId()).stream().map(wishlist -> {
+		Pageable pageable = PageRequest.of(0, 10);
+
+		Page<Wishlist> wishlistPage = wishlistRepository.findByUserId(user.getId(), pageable);
+
+		return wishlistPage.getContent().stream().map(wishlist -> {
 
 			Book book = wishlist.getBook();
 

@@ -8,6 +8,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class IssuedBookServiceImpl implements IssuedBookService {
 
 	private final BookIssueRepository bookIssueRepository;
+
 	private final ModelMapper modelMapper;
 
 	@Override
@@ -33,7 +37,11 @@ public class IssuedBookServiceImpl implements IssuedBookService {
 
 		User user = getLoggedInUser();
 
-		return bookIssueRepository.findByUserIdOrderByIssueDateDesc(user.getId()).stream().map(this::mapToDto).toList();
+		Pageable pageable = PageRequest.of(0, 10);
+
+		Page<BookIssue> issuedBooks = bookIssueRepository.findByUserIdOrderByIssueDateDesc(user.getId(), pageable);
+
+		return issuedBooks.getContent().stream().map(this::mapToDto).toList();
 	}
 
 	private IssuedBookResponseDTO mapToDto(BookIssue issue) {
@@ -53,13 +61,30 @@ public class IssuedBookServiceImpl implements IssuedBookService {
 		dto.setReturnAllowed("ISSUED".equalsIgnoreCase(issue.getIssueStatus())
 				|| "OVERDUE".equalsIgnoreCase(issue.getIssueStatus()));
 
-		LocalDate today = LocalDate.now();
+		long remainingDays = ChronoUnit.DAYS.between(LocalDate.now(), issue.getDueDate());
 
-		long daysRemaining = ChronoUnit.DAYS.between(today, issue.getDueDate());
+		dto.setRemainingDays(remainingDays);
 
-		if (daysRemaining >= 0) {
+		dto.setCountdownEnabled(remainingDays <= 2 && remainingDays >= 0);
 
-			dto.setDaysRemaining(daysRemaining);
+		if (remainingDays == 2) {
+
+			dto.setCountdownMessage("48 Hours Remaining");
+
+		} else if (remainingDays == 1) {
+
+			dto.setCountdownMessage("24 Hours Remaining");
+
+		} else if (remainingDays == 0) {
+
+			dto.setCountdownMessage("Due Today");
+
+		} else if (remainingDays < 0) {
+
+			dto.setCountdownMessage("Overdue");
+		}
+
+		if (remainingDays >= 0) {
 
 			dto.setOverdue(false);
 
@@ -67,11 +92,9 @@ public class IssuedBookServiceImpl implements IssuedBookService {
 
 		} else {
 
-			dto.setDaysRemaining(0L);
-
 			dto.setOverdue(true);
 
-			dto.setOverdueDays(Math.abs(daysRemaining));
+			dto.setOverdueDays(Math.abs(remainingDays));
 
 			dto.setCountdownNote("This book is overdue. Please return it immediately.");
 		}
@@ -95,11 +118,26 @@ public class IssuedBookServiceImpl implements IssuedBookService {
 
 			dto.setShowCountdown(true);
 
-			dto.setRemainingHours(totalSeconds / 3600);
+			long hours = totalSeconds / 3600;
 
-			dto.setRemainingMinutes((totalSeconds % 3600) / 60);
+			long minutes = (totalSeconds % 3600) / 60;
 
-			dto.setRemainingSeconds(totalSeconds % 60);
+			long seconds = totalSeconds % 60;
+
+			dto.setRemainingHours(hours);
+
+			dto.setRemainingMinutes(minutes);
+
+			dto.setRemainingSeconds(seconds);
+
+			if (hours >= 24) {
+
+				dto.setCountdownNote("48 hours remaining to return this book");
+
+			} else {
+
+				dto.setCountdownNote("24 hours remaining to return this book");
+			}
 
 		} else {
 

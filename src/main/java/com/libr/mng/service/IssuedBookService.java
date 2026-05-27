@@ -6,6 +6,5 @@ import com.libr.mng.dto.response.IssuedBookResponseDTO;
 
 public interface IssuedBookService {
 
-    List<IssuedBookResponseDTO> getMyIssuedBooks();
-
+	List<IssuedBookResponseDTO> getMyIssuedBooks();
 }

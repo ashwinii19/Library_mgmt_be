@@ -3,6 +3,9 @@ package com.libr.mng.serviceImpl;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -44,8 +47,11 @@ public class InventoryServiceImpl implements InventoryService {
 	@Override
 	public List<InventoryResponseDTO> getInventory() {
 
-		return bookRepository.findAll().stream().map(book -> modelMapper.map(book, InventoryResponseDTO.class))
-				.toList();
+		Pageable pageable = PageRequest.of(0, 10);
+
+		Page<Book> books = bookRepository.findAll(pageable);
+
+		return books.getContent().stream().map(book -> modelMapper.map(book, InventoryResponseDTO.class)).toList();
 	}
 
 	@Override
@@ -151,4 +157,5 @@ public class InventoryServiceImpl implements InventoryService {
 
 		return userDetails.getUser();
 	}
+
 }
