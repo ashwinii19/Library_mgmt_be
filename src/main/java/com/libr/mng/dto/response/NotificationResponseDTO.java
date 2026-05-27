@@ -1,11 +1,11 @@
 package com.libr.mng.dto.response;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -14,11 +14,14 @@ import java.time.LocalDateTime;
 public class NotificationResponseDTO {
 
     private Long notificationId;
-    private Long userId;
-    private String userName;
+
     private String title;
+
     private String message;
-    private LocalDateTime createdAt;
-    private Boolean isRead;
+
     private String type;
+
+    private Boolean isRead;
+
+    private LocalDateTime createdAt;
 }
