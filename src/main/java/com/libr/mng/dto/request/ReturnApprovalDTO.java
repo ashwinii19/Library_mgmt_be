@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RenewalRequestDTO {
+public class ReturnApprovalDTO {
+
+    private String returnCondition;
 
     private String remarks;
 }
