@@ -4,10 +4,10 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.libr.mng.dto.response.AnalyticsResponseDTO;
-import com.libr.mng.entity.BookIssue;
 import com.libr.mng.repository.BookIssueRepository;
 import com.libr.mng.repository.BookRepository;
 import com.libr.mng.repository.UserRepository;
@@ -30,13 +30,16 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
 		AnalyticsResponseDTO dto = new AnalyticsResponseDTO();
 
-		dto.setTotalBooks((long) bookRepository.findAll().size());
+		dto.setTotalBooks(bookRepository.count());
 
-		dto.setTotalIssuedBooks((long) bookIssueRepository.findByIssueStatus("ISSUED").size());
+		dto.setTotalIssuedBooks(
+				bookIssueRepository.findByIssueStatus("ISSUED", PageRequest.of(0, 1)).getTotalElements());
 
-		dto.setTotalReturnedBooks((long) bookIssueRepository.findByIssueStatus("RETURNED").size());
+		dto.setTotalReturnedBooks(
+				bookIssueRepository.findByIssueStatus("RETURNED", PageRequest.of(0, 1)).getTotalElements());
 
-		dto.setTotalOverdueBooks((long) bookIssueRepository.findByIssueStatus("OVERDUE").size());
+		dto.setTotalOverdueBooks(
+				bookIssueRepository.findByIssueStatus("OVERDUE", PageRequest.of(0, 1)).getTotalElements());
 
 		dto.setActiveUsers(userRepository.count());
 

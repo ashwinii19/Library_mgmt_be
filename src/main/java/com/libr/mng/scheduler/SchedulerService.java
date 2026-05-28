@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,8 @@ public class SchedulerService {
 
 		LocalDate today = LocalDate.now();
 
-		List<BookIssue> issuedBooks = bookIssueRepository.findByIssueStatus("ISSUED");
+		List<BookIssue> issuedBooks = bookIssueRepository.findByIssueStatus("ISSUED", PageRequest.of(0, 1000))
+				.getContent();
 
 		for (BookIssue issue : issuedBooks) {
 
@@ -63,7 +65,7 @@ public class SchedulerService {
 				}
 			}
 
-			if (daysLeft < 0) {
+			if (daysLeft < 0 && !"OVERDUE".equalsIgnoreCase(issue.getIssueStatus())) {
 
 				issue.setIssueStatus("OVERDUE");
 
